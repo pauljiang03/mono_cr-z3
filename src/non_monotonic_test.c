@@ -24,11 +24,6 @@ void main() {
 
     float S = T1; 
 
-
-    float S_prime = T1_prime + Delta_S_add;
-
- 
-    assert(S_prime > S); 
-    
-    assert(S_prime < S); 
+    float S_prime = T1_prime + Delta_S_add;    
+    assert(S_prime <= S); 
 }
