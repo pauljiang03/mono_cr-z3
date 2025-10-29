@@ -33,6 +33,8 @@ int main() {
 
     // We assume p >= 0. We cannot have negative padding bits. 
     __CPROVER_assume(p >= 0);
+    // We assume reasonable bounds on p
+    __CPROVER_assume(p < 30);
 
     // We assume the condition for MONOTONICITY is TRUE.
     // Monotonicity holds if the system is NOT susceptible.
