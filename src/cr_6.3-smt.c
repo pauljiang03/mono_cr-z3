@@ -12,6 +12,9 @@ def exp_unbiased_normal(x):
 
 s = Solver()
 
+#Must show that this is only for EFT terms. Assume how the terms behave?
+#We can still model this but instead give e_0 a diff meaning. 
+
 
 T0 = FP("T0", S32)
 T1 = FP("T1", S32)
