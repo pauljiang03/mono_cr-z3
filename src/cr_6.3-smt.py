@@ -22,7 +22,6 @@ T1 = FP("T1", S32)
 s.add(T1 < T0)
 e0 = exp_unbiased_normal(T0)
 e1 = exp_unbiased_normal(T1) - 24
-#should be 23?
 
 s.add(Abs(e0 - e1) + 1 <= m)
 
@@ -47,7 +46,8 @@ check_duration = end_check_time - start_check_time
 print(f"Result: {result} (found in {check_duration:.4f} seconds)")
 
 if result == sat:
-    print("\nCounterexample found.")
+    print("\nsat")
     print(s.model())
 else:
-    print("\nNo counterexample found.")
+    print("\nunsat")
+
