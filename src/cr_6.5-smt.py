@@ -5,7 +5,7 @@ N = 1024
 m = 24
 
 RNE = RNE()
-S32 = FPSort(8, 24)
+fp32 = FPSort(8, 24)
 
 
 def ceil_log2(n):
@@ -27,8 +27,8 @@ def exp_unbiased_normal(x):
 s = Solver()
 
 
-T_orig = [FP(f"T_orig{i}", S32) for i in range(N)]
-Eps = [FP(f"Eps{i}", S32) for i in range(N)]
+T_orig = [FP(f"T_orig{i}", fp32) for i in range(N)]
+Eps = [FP(f"Eps{i}", fp32) for i in range(N)]
 
 e_T_list = []
 e_eps_list = []
@@ -72,4 +72,6 @@ if result == sat:
     print(model)
 else:
     print("\nunsat")
+
+
 
