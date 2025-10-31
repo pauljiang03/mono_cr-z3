@@ -22,6 +22,7 @@ T1 = FP("T1", S32)
 s.add(T1 < T0)
 e0 = exp_unbiased_normal(T0)
 e1 = exp_unbiased_normal(T1) - 24
+#should be 23?
 
 s.add(Abs(e0 - e1) + 1 <= m)
 
