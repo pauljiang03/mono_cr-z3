@@ -1,4 +1,9 @@
 from z3 import *
+import time
+
+'''
+Result: unsat (found in 1141.6448 seconds)
+'''
 
 m = 24
 RNE = RNE()
@@ -12,19 +17,15 @@ def exp_unbiased_normal(x):
 
 s = Solver()
 
-#Must show that this is only for EFT terms. Assume how the terms behave?
-#We can still model this but instead give e_0 a diff meaning. 
-
-
 T0 = FP("T0", S32)
 T1 = FP("T1", S32)
-
+s.add(T1 < T0)
 e0 = exp_unbiased_normal(T0)
-e1 = exp_unbiased_normal(T1)
+e1 = exp_unbiased_normal(T1) - 24
 
-s.add(Abs(e0 - e1) + 2 <= m)
+s.add(Abs(e0 - e1) + 1 <= m)
 
-print(f"Checking: |e0 - e1| + 2 <= {m}")
+print(f"Checking: |e0 - e1| + 1 <= {m}")
 
 s32_0 = FPVal(0.0, S32)
 s32_1 = fpAdd(RNE, s32_0, T0)
@@ -37,8 +38,12 @@ s64 = fpAdd(RNE, s64_1, fpToFP(RNE, T1, S64))
 s.add(fpToFP(RNE, s64, S32) != s32)
 
 print("\nSearching for counterexample...")
+start_check_time = time.monotonic()
 result = s.check()
-print(f"Result: {result}")
+end_check_time = time.monotonic()
+
+check_duration = end_check_time - start_check_time
+print(f"Result: {result} (found in {check_duration:.4f} seconds)")
 
 if result == sat:
     print("\nCounterexample found.")
