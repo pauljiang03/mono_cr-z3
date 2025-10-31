@@ -6,7 +6,7 @@ N can be set 5, 9, or 16 to verify for any existing tensor core architecture
 For N <= 128, can prove in under 1 minute
 '''
 
-N = 256
+N = 5
 m = 24
 
 RNE = RNE()
@@ -37,54 +37,46 @@ for i, ti in enumerate(T):
     not_exceptional = And(Not(fpIsNaN(ti)), Not(fpIsInf(ti)))
     s.add(not_exceptional)
 
-if N == 0:
-    growth = 0
-    s.add(Bool(True))
-elif N == 1:
-    growth = 0
-    s.add(0 <= m)
-else:
-    e_min = e_list[0]
-    e_max = e_list[0]
 
-    for i in range(1, N):
-        e_current = e_list[i]
-        e_min = If(e_current < e_min, e_current, e_min)
-        e_max = If(e_current > e_max, e_current, e_max)
+e_min = e_list[0]
+e_max = e_list[0]
 
-    growth = ceil_log2(N)
-    K_span = e_max - (e_min - 24) + growth
+for i in range(1, N):
+    e_current = e_list[i]
+    e_min = If(e_current < e_min, e_current, e_min)
+    e_max = If(e_current > e_max, e_current, e_max)
 
-    print(f"(e_max - e_min) + ceil_log2({N}) <= {m}")
-    s.add(K_span <= m)
+growth = ceil_log2(N)
+K_span = e_max - (e_min - 24) + growth
+
+print(f"(e_max - e_min) + ceil_log2({N}) <= {m}")
+s.add(K_span <= m)
 
 step_premises = []
 
-if N > 1:
-    s32_intermediate_sum = T[0]
-    for i in range(1, N):
-        t_a = s32_intermediate_sum
-        t_b = T[i]
 
-        e_a = exp_unbiased_normal(t_a)
-        e_b = e_list[i]
-        e_max_2 = If(e_a > e_b, e_a, e_b)
-        e_min_2 = If(e_a < e_b, e_a, e_b)
+s32_intermediate_sum = T[0]
+for i in range(1, N):
+    t_a = s32_intermediate_sum
+    t_b = T[i]
 
-        one_span = e_max_2 - (e_min_2 - 24) + 1
+    e_a = exp_unbiased_normal(t_a)
+    e_b = e_list[i]
+    e_max_2 = If(e_a > e_b, e_a, e_b)
+    e_min_2 = If(e_a < e_b, e_a, e_b)
 
-        step_premise_holds = (one_span <= m)
-        step_premises.append(step_premise_holds)
+    one_span = e_max_2 - (e_min_2 - 24) + 1
 
-        s32_intermediate_sum = fpAdd(RNE, s32_intermediate_sum, t_b)
+    step_premise_holds = (one_span <= m)
+    step_premises.append(step_premise_holds)
+
+    s32_intermediate_sum = fpAdd(RNE, s32_intermediate_sum, t_b)
 
 
-if N > 1:
-    all_steps_hold = And(step_premises)
-    all_steps_not_hold = Not(all_steps_hold)
-    s.add(all_steps_not_hold)
-else:
-    print("\nN < 2, no 2-term additions to check.")
+
+all_steps_hold = And(step_premises)
+all_steps_not_hold = Not(all_steps_hold)
+s.add(all_steps_not_hold)
 
 print("Running solver...")
 start_check_time = time.monotonic()
